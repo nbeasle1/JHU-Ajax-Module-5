@@ -22,6 +22,7 @@ var menuItemsUrl =
   "https://coursera-jhu-default-rtdb.firebaseio.com/menu_items/";
 var menuItemsTitleHtml = "snippets/menu-items-title.html";
 var menuItemHtml = "snippets/menu-item.html";
+var aboutUsHtml = "snippets/about.html"
 
 // Convenience function for inserting innerHTML for 'select'
 var insertHtml = function (selector, html) {
@@ -83,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 showLoading("#main-content");
 $ajaxUtils.sendGetRequest(
   allCategoriesUrl,
-  [...], // ***** <---- TODO: STEP 1: Substitute [...] ******
+  buildAndShowHomeHTML, // ***** <---- TODO: STEP 1: Substitute [...] ******
   true); // Explicitly setting the flag to get JSON from server processed into an object literal
 });
 // *** finish **
@@ -101,7 +102,11 @@ function buildAndShowHomeHTML (categories) {
       // TODO: STEP 2: Here, call chooseRandomCategory, passing it retrieved 'categories'
       // Pay attention to what type of data that function returns vs what the chosenCategoryShortName
       // variable's name implies it expects.
-      // var chosenCategoryShortName = ....
+
+      // To get the '' around the value, we template literal in to include the quotes, as the loadMenuItems looks for 
+      // a string that has '' around the value (which just accessing short_name doesn't provide)
+      var chosenCategoryShortName = `'${chooseRandomCategory(categories)["short_name"]}'`;
+      console.log(chosenCategoryShortName)
 
 
       // TODO: STEP 3: Substitute {{randomCategoryShortName}} in the home html snippet with the
@@ -114,14 +119,16 @@ function buildAndShowHomeHTML (categories) {
       // $dc.loadMenuItems('L')
       // Hint: you need to surround the chosen category short name with something before inserting
       // it into the home html snippet.
-      //
-      // var homeHtmlToInsertIntoMainPage = ....
 
 
+      var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml, "randomCategoryShortName", chosenCategoryShortName);
+      console.log(homeHtmlToInsertIntoMainPage)
       // TODO: STEP 4: Insert the produced HTML in STEP 3 into the main page
       // Use the existing insertHtml function for that purpose. Look through this code for an example
       // of how to do that.
       // ....
+
+      insertHtml("#main-content", homeHtmlToInsertIntoMainPage)
 
     },
     false); // False here because we are getting just regular HTML from the server, so no need to process JSON.
@@ -137,6 +144,20 @@ function chooseRandomCategory (categories) {
   return categories[randomArrayIndex];
 }
 
+/*
+ * Create a random number between 1-5 
+ * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+ */
+function createRandomNumber() {
+  const minCeiled = Math.ceil(1);
+  const maxFloored = Math.floor(6);
+  return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
+}
+
+function buildAndShowAboutUsHTML() {
+
+  // load about us snippet page
+}
 
 // Load the menu categories view
 dc.loadMenuCategories = function () {
