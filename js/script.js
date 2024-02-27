@@ -22,7 +22,7 @@ var menuItemsUrl =
   "https://coursera-jhu-default-rtdb.firebaseio.com/menu_items/";
 var menuItemsTitleHtml = "snippets/menu-items-title.html";
 var menuItemHtml = "snippets/menu-item.html";
-var aboutUsHtml = "snippets/about.html"
+var aboutUsHtmlUrl = "snippets/about.html";
 
 // Convenience function for inserting innerHTML for 'select'
 var insertHtml = function (selector, html) {
@@ -106,7 +106,6 @@ function buildAndShowHomeHTML (categories) {
       // To get the '' around the value, we template literal in to include the quotes, as the loadMenuItems looks for 
       // a string that has '' around the value (which just accessing short_name doesn't provide)
       var chosenCategoryShortName = `'${chooseRandomCategory(categories)["short_name"]}'`;
-      console.log(chosenCategoryShortName)
 
 
       // TODO: STEP 3: Substitute {{randomCategoryShortName}} in the home html snippet with the
@@ -122,7 +121,6 @@ function buildAndShowHomeHTML (categories) {
 
 
       var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml, "randomCategoryShortName", chosenCategoryShortName);
-      console.log(homeHtmlToInsertIntoMainPage)
       // TODO: STEP 4: Insert the produced HTML in STEP 3 into the main page
       // Use the existing insertHtml function for that purpose. Look through this code for an example
       // of how to do that.
@@ -154,9 +152,41 @@ function createRandomNumber() {
   return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
 }
 
-function buildAndShowAboutUsHTML() {
+// load about us snippet page
+function buildAndShowAboutUsHTML(aboutUsHtml) {
 
-  // load about us snippet page
+  // we have to set this var here, because we're overwriting it below
+  var aboutUsHtmlToInsertIntoMainPage = aboutUsHtml;
+
+  // create random number for stars filled
+  var randomNumberStarsFilled = createRandomNumber();
+  
+  // "fill in" all of the filled in stars
+  for(i = 1; i <= randomNumberStarsFilled; i++) {
+    aboutUsHtmlToInsertIntoMainPage = insertProperty(aboutUsHtmlToInsertIntoMainPage, `class${i}`, "fa fa-star")
+  }
+
+  // keep these stars unfilled
+  for (i = randomNumberStarsFilled + 1; i <= 5; i++) {
+    aboutUsHtmlToInsertIntoMainPage = insertProperty(aboutUsHtmlToInsertIntoMainPage, `class${i}`, "fa fa-star-o")
+  }
+
+
+
+  // insert into content
+  insertHtml("#main-content", aboutUsHtmlToInsertIntoMainPage);
+
+  var ratingText = document.querySelector(".rating");
+  ratingText.textContent = `${randomNumberStarsFilled}-star Rating`;
+}
+
+// load the about us view
+dc.loadAboutUs = function () {
+  showLoading("#main-content");
+  $ajaxUtils.sendGetRequest(
+    aboutUsHtmlUrl,
+    buildAndShowAboutUsHTML,
+    false);
 }
 
 // Load the menu categories view
